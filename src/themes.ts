@@ -1,3 +1,5 @@
+import {Colors} from "./types";
+
 const dark_vscode_tribute = {
     default            : '#D4D4D4',
     background         : '#1E1E1E',
@@ -22,7 +24,7 @@ const light_mitsuketa_tribute = {
     primitive          : '#386FA4'
 };
 
-const themes = {
+const themes: { [key: string]: Colors } = {
     dark_vscode_tribute     : dark_vscode_tribute,
     light_mitsuketa_tribute : light_mitsuketa_tribute
 };

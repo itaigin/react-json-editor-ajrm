@@ -1,5 +1,5 @@
 /node_modules/
-/dist/
+/lib/
 /test/__snapshots__/
 /example/node_modules/
 /example/dist/
