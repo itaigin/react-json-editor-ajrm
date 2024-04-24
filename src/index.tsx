@@ -1231,7 +1231,7 @@ class JSONInput extends Component<JSONInputProps, JSONInputState> {
                   setError(
                     i,
                     format(locale.invalidToken.tokenSequence.prohibited, {
-                      firstToken: buffer.tokens_merge?.[found].string,
+                      firstToken: buffer.tokens_merge?.[string]?.string,
                       secondToken: string,
                     }),
                   );
