@@ -619,7 +619,7 @@ class JSONInput extends Component<JSONInputProps, JSONInputState> {
       this.stopEvent(event);
     } else {
       event.preventDefault();
-      let text = event.clipboardData.getData("text/plain");
+      let text = event.clipboardData.getData("text/plain")?.replace(/(\r\n|\n|\r|\t|\u200B)/gm, '');
       document.execCommand("insertText", false, text);
     }
     this.update();
