@@ -1,5 +1,5 @@
 {
-  "name": "react-json-editor-ajrm-platform",
+  "name": "react-json-editor-ajrm-ts-platform",
   "version": "3.0.1",
   "description": "A stylish, editor-like, modular, react component for viewing, editing, and debugging javascript object syntax!",
   "author": "andrew.redican.mejia@gmail.com",
@@ -17,7 +17,7 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "clean": "rm -rf ./lib",
+    "clean": "rimraf ./lib",
     "build": "npm run clean && tsc",
     "prepack": "npm run build",
     "release": "npm publish",
