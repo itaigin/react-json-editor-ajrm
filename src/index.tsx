@@ -761,7 +761,7 @@ class JSONInput extends Component<JSONInputProps, JSONInputState> {
             break;
           case "#text":
             buffer.tokens_unknown.push({
-              string: child.wholeText,
+              string: child.textContent,
               type: "unknown",
             });
             break;
