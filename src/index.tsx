@@ -1,12 +1,11 @@
 // @ts-nocheck
-import React, {Component, ReactNode} from "react";
+import React, { Component } from "react";
 import themes from "./themes";
 import { identical, getType } from "./mitsuketa";
 import err from "./err";
 import { format } from "./locale";
 import defaultLocale from "./locale/en";
-import {Colors, JSONInputProps, JSONInputState} from "./types";
-import {Node} from "@babel/core";
+import { Colors, JSONInputProps, JSONInputState } from "./types";
 
 class JSONInput extends Component<JSONInputProps, JSONInputState> {
   constructor(props: JSONInputProps) {
@@ -42,6 +41,7 @@ class JSONInput extends Component<JSONInputProps, JSONInputState> {
       jsObject: undefined,
       lines: 0,
       error: false,
+      isLoading: false,
     };
     if (!this.props.locale) {
       console.warn(
@@ -138,9 +138,9 @@ class JSONInput extends Component<JSONInputProps, JSONInputState> {
       clearInterval(this.timer);
       this.timer = false;
     }
-    this.updateTime = false;
     this.waitAfterKeyPress =
       "waitAfterKeyPress" in this.props ? this.props.waitAfterKeyPress : 1000;
+    this.updateTime = false;
     this.resetConfiguration = "reset" in this.props ? this.props.reset : false;
   }
   render() {
@@ -148,10 +148,11 @@ class JSONInput extends Component<JSONInputProps, JSONInputState> {
       markupText = this.state.markupText,
       error = this.props.error || this.state.error,
       colors = this.colors,
-      style = this.style,
+      style = this.style || {},
       confirmGood = this.confirmGood,
       totalHeight = this.totalHeight,
       totalWidth = this.totalWidth,
+      isLoading = this.state.isLoading,
       hasError = !!this.props.error || (error ? "token" in error : false);
     this.renderCount++;
     return (
@@ -183,15 +184,28 @@ class JSONInput extends Component<JSONInputProps, JSONInputState> {
               transitionTimingFunction: "cubic-bezier(0, 1, 0.5, 1)",
             }}
           >
-            <svg height="30px" width="30px" viewBox="0 0 100 100">
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                fill="green"
-                opacity="0.85"
-                d="M39.363,79L16,55.49l11.347-11.419L39.694,56.49L72.983,23L84,34.085L39.363,79z"
-              />
-            </svg>
+              {isLoading
+                  ? <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" width="30px" height="30px" viewBox="0 0 30 30" version="1.1">
+                      <g id="surface1">
+                          <path d="M 8.863281 15 C 8.863281 14.246094 8.253906 13.636719 7.5 13.636719 L 2.046875 13.636719 C 1.292969 13.636719 0.683594 14.246094 0.683594 15 C 0.683594 15.753906 1.292969 16.363281 2.046875 16.363281 L 7.5 16.363281 C 8.253906 16.363281 8.863281 15.753906 8.863281 15 Z M 8.863281 15 "/>
+                          <path d="M 27.953125 13.636719 L 25.226562 13.636719 C 24.472656 13.636719 23.863281 14.246094 23.863281 15 C 23.863281 15.753906 24.472656 16.363281 25.226562 16.363281 L 27.953125 16.363281 C 28.707031 16.363281 29.316406 15.753906 29.316406 15 C 29.316406 14.246094 28.707031 13.636719 27.953125 13.636719 Z M 27.953125 13.636719 "/>
+                          <path d="M 15.683594 8.183594 C 16.433594 8.183594 17.046875 7.570312 17.046875 6.816406 L 17.046875 1.363281 C 17.046875 0.609375 16.433594 0 15.683594 0 C 14.929688 0 14.316406 0.609375 14.316406 1.363281 L 14.316406 6.816406 C 14.316406 7.570312 14.929688 8.183594 15.683594 8.183594 Z M 15.683594 8.183594 "/>
+                          <path d="M 15.683594 21.816406 C 14.929688 21.816406 14.316406 22.429688 14.316406 23.183594 L 14.316406 28.636719 C 14.316406 29.390625 14.929688 30 15.683594 30 C 16.433594 30 17.046875 29.390625 17.046875 28.636719 L 17.046875 23.183594 C 17.046875 22.429688 16.433594 21.816406 15.683594 21.816406 Z M 15.683594 21.816406 "/>
+                          <path d="M 7.003906 4.394531 C 6.472656 3.859375 5.609375 3.859375 5.074219 4.394531 C 4.542969 4.925781 4.542969 5.789062 5.074219 6.320312 L 8.933594 10.179688 C 9.199219 10.445312 9.546875 10.578125 9.894531 10.578125 C 10.246094 10.578125 10.59375 10.445312 10.859375 10.179688 C 11.394531 9.644531 11.394531 8.78125 10.859375 8.25 Z M 7.003906 4.394531 "/>
+                          <path d="M 22.429688 19.820312 C 21.898438 19.289062 21.035156 19.289062 20.503906 19.820312 C 19.96875 20.355469 19.96875 21.21875 20.503906 21.75 L 24.359375 25.605469 C 24.625 25.871094 24.976562 26.007812 25.324219 26.007812 C 25.671875 26.007812 26.023438 25.871094 26.289062 25.605469 C 26.820312 25.074219 26.820312 24.210938 26.289062 23.679688 Z M 22.429688 19.820312 "/>
+                          <path d="M 8.933594 19.820312 L 5.074219 23.679688 C 4.542969 24.210938 4.542969 25.074219 5.074219 25.605469 C 5.339844 25.871094 5.691406 26.007812 6.039062 26.007812 C 6.386719 26.007812 6.738281 25.871094 7.003906 25.605469 L 10.859375 21.75 C 11.394531 21.21875 11.394531 20.355469 10.859375 19.820312 C 10.328125 19.289062 9.464844 19.289062 8.933594 19.820312 Z M 8.933594 19.820312 "/>
+                      </g>
+                  </svg>
+                  : <svg height="30px" width="30px" viewBox="0 0 100 100">
+                      <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        fill="green"
+                        opacity="0.85"
+                        d="M39.363,79L16,55.49l11.347-11.419L39.694,56.49L72.983,23L84,34.085L39.363,79z"
+                      />
+                  </svg>
+              }
           </div>
         ) : (
           void 0
@@ -549,6 +563,7 @@ class JSONInput extends Component<JSONInputProps, JSONInputState> {
         error: data.error,
       });
     let cursorPosition = this.getCursorPosition(data.error) + cursorOffset;
+    this.updateTime = false;
     this.setState({
       plainText: data.indented,
       markupText: data.markup,
@@ -556,22 +571,24 @@ class JSONInput extends Component<JSONInputProps, JSONInputState> {
       jsObject: data.jsObject,
       lines: data.lines,
       error: data.error,
+      isLoading: false,
     });
-    this.updateTime = false;
     if (updateCursorPosition) this.setCursorPosition(cursorPosition);
   }
   scheduledUpdate() {
     if ("onKeyPressUpdate" in this.props)
       if (this.props.onKeyPressUpdate === false) return;
     const { updateTime } = this;
-    if (updateTime === false) return;
-    if (updateTime > new Date().getTime()) return;
+    if (updateTime === false || updateTime > new Date().getTime()) {
+        return;
+    }
     this.update();
   }
   setUpdateTime() {
     if ("onKeyPressUpdate" in this.props)
       if (this.props.onKeyPressUpdate === false) return;
     this.updateTime = new Date().getTime() + this.waitAfterKeyPress;
+    this.setState({ isLoading: true });
   }
   stopEvent(event: any) {
     if (!event) return;
@@ -645,8 +662,10 @@ class JSONInput extends Component<JSONInputProps, JSONInputState> {
     this.refLabels.scrollTop = event.target.scrollTop;
   }
   componentDidUpdate() {
-    this.updateInternalProps();
-    this.showPlaceholder();
+    if (!this.state.isLoading) {
+        this.updateInternalProps();
+        this.showPlaceholder();
+    }
   }
   componentDidMount() {
     this.showPlaceholder();
@@ -703,6 +722,7 @@ class JSONInput extends Component<JSONInputProps, JSONInputState> {
       markupText: data.markup,
       lines: data.lines,
       error: data.error,
+      isLoading: false,
     });
   }
   tokenize(something: any) {

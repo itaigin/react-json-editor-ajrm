@@ -149,13 +149,14 @@ export interface JSONInputProps {
 }
 
 export interface JSONInputState {
-  prevPlaceholder:string,
-  markupText:string,
-  plainText:string,
-  json:string,
+  prevPlaceholder: string,
+  markupText: string,
+  plainText: string,
+  json: string,
   jsObject?: string,
-  lines           : number,
-  error           : boolean
+  lines: number,
+  error: boolean,
+  isLoading: boolean
 }
 
 export interface Token {
