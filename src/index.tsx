@@ -8,6 +8,8 @@ import defaultLocale from "./locale/en";
 import { Colors, JSONInputProps, JSONInputState } from "./types";
 
 class JSONInput extends Component<JSONInputProps, JSONInputState> {
+  private mappedKeys = [];
+
   constructor(props: JSONInputProps) {
     super(props);
     this.updateInternalProps = this.updateInternalProps.bind(this);
@@ -553,15 +555,17 @@ class JSONInput extends Component<JSONInputProps, JSONInputState> {
   update(cursorOffset = 0, updateCursorPosition = true) {
     const container = this.refContent,
       data = this.tokenize(container);
-    if ("onChange" in this.props)
+    if ("onChange" in this.props) {
+      const jsObject = this.decodePlaceholder(data.jsObject);
       this.props.onChange({
-        plainText: data.indented,
-        markupText: data.markup,
-        json: data.json,
-        jsObject: data.jsObject,
-        lines: data.lines,
-        error: data.error,
+          plainText: data.indented,
+          markupText: data.markup,
+          json: data.json,
+          jsObject,
+          lines: data.lines,
+          error: data.error,
       });
+    }
     let cursorPosition = this.getCursorPosition(data.error) + cursorOffset;
     this.updateTime = false;
     this.setState({
@@ -648,15 +652,17 @@ class JSONInput extends Component<JSONInputProps, JSONInputState> {
     if ("viewOnly" in this.props) if (this.props.viewOnly) return;
     const container = this.refContent,
       data = this.tokenize(container);
-    if ("onBlur" in this.props)
+    if ("onBlur" in this.props) {
+      const jsObject = this.decodePlaceholder(data.jsObject)
       this.props.onBlur({
         plainText: data.indented,
         markupText: data.markup,
         json: data.json,
-        jsObject: data.jsObject,
+        jsObject,
         lines: data.lines,
         error: data.error,
       });
+    }
   }
   onScroll(event) {
     this.refLabels.scrollTop = event.target.scrollTop;
@@ -672,7 +678,46 @@ class JSONInput extends Component<JSONInputProps, JSONInputState> {
   }
   componentWillUnmount() {
     if (this.timer) clearInterval(this.timer);
+    this.mappedKeys = [];
   }
+
+  private isObject(value) {
+      return typeof value === 'object' && !Array.isArray(value) && value !== null
+  }
+
+  private isString(value) {
+      return typeof value === 'string' || value instanceof String;
+  }
+
+  private encodePlaceholder(placeholder) {
+      try {
+          if (!this.isObject(placeholder)) return;
+          for (const [key, value] of Object.entries(placeholder)) {
+              if (!this.isString(value)) continue;
+              try {
+                  placeholder[key] = JSON.parse(value);
+                  this.mappedKeys.push(key);
+              } catch (e) {
+                  placeholder[key] = value;
+              }
+          }
+      } catch (e) {
+          console.error(e);
+      }
+  }
+
+  private decodePlaceholder(placeholder) {
+      const decodedPlaceholder = structuredClone(placeholder);
+      this.mappedKeys.forEach(key => {
+          try {
+              decodedPlaceholder[key] = JSON.stringify(placeholder[key]);
+          } catch (e) {
+              console.error(e);
+          }
+      });
+      return decodedPlaceholder;
+  }
+
   showPlaceholder() {
     const placeholderDoesNotExist = !("placeholder" in this.props);
     if (placeholderDoesNotExist) return;
@@ -682,6 +727,8 @@ class JSONInput extends Component<JSONInputProps, JSONInputState> {
     const placeholderHasEmptyValues =
       [undefined, null].indexOf(placeholder) > -1;
     if (placeholderHasEmptyValues) return;
+
+    this.encodePlaceholder(placeholder);
 
     const { prevPlaceholder, jsObject } = this.state;
     const { resetConfiguration } = this;

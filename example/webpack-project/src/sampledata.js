@@ -1,5 +1,6 @@
 const sampleData = {
-    'example prop' : null,
+    feature: "[\"pr\",\"rl\",\"ap\",\"ob\",\"td\",\"w\",\"is\",\"aw\",\"qc\",\"t\",\"dt\",\"pf\",\"an\"]",
+    feature1: "{\"pr\":[\"C\",\"D\"],\"rl\":[\"C\",\"D\"],\"ap\":[\"C\",\"D\"],\"ob\":[\"C\",\"D\"],\"w\":[\"C\",\"D\"],\"is\":[\"C\",\"D\"],\"aw\":[\"C\",\"D\"],\"qc\":[\"C\",\"D\"],\"t\":[\"C\",\"D\"],\"pf\":[\"C\",\"D\"],\"td\":[\"C\",\"D\"],\"dt\":[\"C\",\"D\"],\"an\":[\"C\",\"D\"]}",
     nancy_mccarty : {
         A1: {
             userID: "nancy_mccarty",
