@@ -8,7 +8,7 @@ import defaultLocale from "./locale/en";
 import { Colors, JSONInputProps, JSONInputState } from "./types";
 
 class JSONInput extends Component<JSONInputProps, JSONInputState> {
-  private mappedKeys = [];
+  private mappedKeys = new Set();
 
   constructor(props: JSONInputProps) {
     super(props);
@@ -678,11 +678,15 @@ class JSONInput extends Component<JSONInputProps, JSONInputState> {
   }
   componentWillUnmount() {
     if (this.timer) clearInterval(this.timer);
-    this.mappedKeys = [];
+    this.mappedKeys.clear();
+  }
+
+  private isArray(value) {
+      return Array.isArray(value);
   }
 
   private isObject(value) {
-      return typeof value === 'object' && !Array.isArray(value) && value !== null
+      return typeof value === 'object' && !this.isArray(value) && value !== null
   }
 
   private isString(value) {
@@ -693,12 +697,24 @@ class JSONInput extends Component<JSONInputProps, JSONInputState> {
       try {
           if (!this.isObject(placeholder)) return;
           for (const [key, value] of Object.entries(placeholder)) {
-              if (!this.isString(value)) continue;
-              try {
-                  placeholder[key] = JSON.parse(value);
-                  this.mappedKeys.push(key);
-              } catch (e) {
-                  placeholder[key] = value;
+              const isArray = this.isArray(value);
+              if (!this.isString(value) && !isArray) continue;
+              if (isArray) {
+                  value.forEach((val, index) => {
+                      try {
+                          placeholder[key][index] = JSON.parse(val);
+                          this.mappedKeys.add({ key, type: "array" });
+                      } catch (e) {
+                          placeholder[key][index] = val;
+                      }
+                  })
+              } else {
+                  try {
+                      placeholder[key] = JSON.parse(value);
+                      this.mappedKeys.add({ key });
+                  } catch (e) {
+                      placeholder[key] = value;
+                  }
               }
           }
       } catch (e) {
@@ -707,12 +723,24 @@ class JSONInput extends Component<JSONInputProps, JSONInputState> {
   }
 
   private decodePlaceholder(placeholder) {
+      if (!placeholder) return null;
       const decodedPlaceholder = structuredClone(placeholder);
-      this.mappedKeys.forEach(key => {
-          try {
-              decodedPlaceholder[key] = JSON.stringify(placeholder[key]);
-          } catch (e) {
-              console.error(e);
+      Array.from(this.mappedKeys).forEach(item => {
+          const value = placeholder[item.key];
+          if (item.type === "array") {
+              value.forEach((val, index) => {
+                  try {
+                      decodedPlaceholder[item.key][index] = JSON.stringify(val);
+                  } catch (e) {
+                      decodedPlaceholder[item.key][index] = val;
+                  }
+              })
+          } else {
+              try {
+                  decodedPlaceholder[item.key] = JSON.stringify(value);
+              } catch (e) {
+                  console.error(e);
+              }
           }
       });
       return decodedPlaceholder;

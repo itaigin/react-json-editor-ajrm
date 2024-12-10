@@ -40,6 +40,7 @@ class App extends Component {
           theme="light_mitsuketa_tribute"
           locale={locale}
           waitAfterKeyPress={2000}
+          onChange={(data) => console.log(data)}
           colors={{
             string: "#DAA520" // overrides theme colors with whatever color value you want
           }}
