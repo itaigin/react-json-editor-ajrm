@@ -403,7 +403,7 @@ class JSONInput extends Component<JSONInputProps, JSONInputState> {
           ...style.errorMessage,
         }}
       >
-        {format(locale.format, error)}
+        {error.line ? format(locale.format, error) : error.reason}
       </p>
     );
   }
